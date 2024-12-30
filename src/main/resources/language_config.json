@@ -1,0 +1,24 @@
+{
+  "ru": {
+    "name": "Russian",
+    "supports_stress": true,
+    "tenses": ["PAST", "PRESENT", "FUTURE"],
+    "genders": ["MASCULINE", "FEMININE", "NEUTER"]
+  },
+  "pl": {
+    "name": "Polish",
+    "supports_stress": false,
+    "tenses": ["PAST", "PRESENT", "FUTURE"],
+    "genders": ["MASCULINE", "FEMININE", "NEUTER"]
+  },
+  "es": {
+    "name": "Spanish",
+    "supports_stress": false,
+    "tenses": [
+      "PAST_SIMPLE", "PAST_PROGRESSIVE", "PAST_PERFECT",
+      "PRESENT_SIMPLE", "PRESENT_PERFECT",
+      "FUTURE", "FUTURE_PERFECT",
+      "CONDITIONAL", "CONDITIONAL_PERFECT"],
+    "genders": ["MASCULINE", "FEMININE"]
+  }
+}

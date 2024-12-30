@@ -21,7 +21,7 @@ class JsonParseServiceGPTImplTest {
 
     @BeforeEach
     public void setUp() {
-        objectMapper = Mockito.mock(ObjectMapper.class);
+        objectMapper = new ObjectMapper();
         jsonParseService = new JsonParseServiceGPTImpl(objectMapper);
     }
 
@@ -32,8 +32,6 @@ class JsonParseServiceGPTImplTest {
         String responseBody = "{ \"choices\": [{ \"message\": { \"content\": " +
                 "{ \"targetWord\": \"Hola\", \"targetSentence\": \"Hola, ¿cómo estás?\" }" +
                 "} }] }";
-        JsonNode rootNode = new ObjectMapper().readTree(responseBody);
-        when(objectMapper.readTree(anyString())).thenReturn(rootNode);
         NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> {
             jsonParseService.parseFlashcard(responseBody, FlashcardType.WORD);
         });
@@ -43,8 +41,6 @@ class JsonParseServiceGPTImplTest {
     @Test
     public void parseWordFlashcard_generalParsingException() throws Exception {
         String responseBody = "{ \"invalid-json\": \"invalid\" }";
-        JsonNode rootNode = new ObjectMapper().readTree(responseBody);
-        when(objectMapper.readTree(anyString())).thenReturn(rootNode);
         NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> {
             jsonParseService.parseFlashcard(responseBody, FlashcardType.WORD);
         });
@@ -52,13 +48,14 @@ class JsonParseServiceGPTImplTest {
     }
 
     @Test
-    public void parseWordFlashcard_missingContentInResponseBody_throwsNoSuchElementException() throws Exception {
-        String responseBody = "{ \"choices\": [] }";  // Simulates missing 'content' field
-        when(objectMapper.readTree(anyString())).thenThrow(new NoSuchElementException("Missing 'content' field in the JSON response"));
+    public void parseWordFlashcard_missingContentInResponseBody_throwsNoSuchElementException() {
+        String responseBody = "{ \"choices\": [] }"; // Simulates missing 'content' field
+
         NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> {
             jsonParseService.parseFlashcard(responseBody, FlashcardType.WORD);
         });
-        assertEquals("Missing 'content' field in the JSON response", exception.getMessage());
+
+        assertEquals("Missing 'choices' field in the JSON response", exception.getMessage());
     }
 
 }
