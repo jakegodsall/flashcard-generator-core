@@ -9,6 +9,3 @@ COPY pom.xml .
 
 # Download dependencies to cache them
 RUN mvn dependency:go-offline -B
-
-# Run tests (unit, integration) to ensure build passes
-CMD ["mvn", "test"]
