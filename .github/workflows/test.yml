@@ -1,0 +1,27 @@
+name: Test Workflow
+
+on:
+  workflow_call:
+    inputs:
+      branch:
+        required: true
+        type: string
+    secrets:
+      maven_central_username:
+        required: false
+      maven_central_password:
+        required: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build and test using Docker
+        run: |
+          docker build -t flashcard-generator-core .
+          docker run --rm \
+            -v "$(pwd)":/app \
+            flashcard-generator-core

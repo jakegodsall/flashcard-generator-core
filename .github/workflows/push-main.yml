@@ -1,0 +1,12 @@
+name: Test and deploy on main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml
+    with:
+      branch: main

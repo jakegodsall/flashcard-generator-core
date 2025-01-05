@@ -1,0 +1,12 @@
+name: Test on develop
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  test:
+    uses: ./github/workflows/test.yml
+    with:
+      branch: develop
