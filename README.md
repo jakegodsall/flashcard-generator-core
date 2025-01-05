@@ -1,8 +1,9 @@
+
 # Flashcard Generator Core
 
 This project is the `flashcard-generator-core` library that uses the GPT API to create basic sentences using provided words in different languages.
 
-It helps in learning languages by generating example sentences. 
+It helps in learning languages by generating example sentences.
 The library supports various languages and can export the generated sentences to different file formats such as CSV and JSON.
 
 ## Features
@@ -46,7 +47,7 @@ The Flashcard Generator Core requires an API key to access the language processi
 
 ### Storage
 
-The application or service using this core library will need to handle API key management. 
+The application or service using this core library will need to handle API key management.
 
 The library provides a `ApiKeyConfig` class that can read and write a provided API key to a `api_config.json` file in a `.flashcard-generator` directory in the user's home directory.
 
@@ -55,12 +56,12 @@ It is important to keep your API key secure and not share it with others. Usage 
 
 ## Usage
 
-To generate flashcards with the application there is essentially a three-step process. 
+To generate flashcards with the application there is essentially a three-step process.
 1. Load the words into memory using an implementation of `InputService`.
 2. Generate the flashcards using an implementation of `FlashcardService`.
 3. Export the output using an implementation of `OutputService`.  
 
-While the Flashcard Generator Core does not provide a direct user interface, it is designed to be integrated into other applications that offer various modes for inputting data and exporting the generated flashcards. 
+While the Flashcard Generator Core does not provide a direct user interface, it is designed to be integrated into other applications that offer various modes for inputting data and exporting the generated flashcards.
 This flexibility allows developers to create applications that fit their specific workflow and preferences.
 
 ### Input Services
@@ -112,6 +113,29 @@ Example `language_config.json`:
 
 The choice of languages and the specific features that can be configured are heavily dependent on the capabilities of the underlying language model that the application uses. The language model's ability to accurately generate content in different languages and handle linguistic nuances like stress, gender, and tense is a key factor in determining how well the application can support each language.
 
+## Gitflow Workflow Integration
+
+The repository follows the Gitflow branching model and uses three GitHub Actions workflows for automation:
+
+1. **Test Workflow**:
+   - Reusable workflow located in `.github/workflows/test.yml`.
+   - Runs tests on the project using a Docker container.
+
+2. **Push-Develop Workflow**:
+   - Triggered on pushes to the `develop` branch.
+   - Calls the reusable `test.yml` workflow to ensure all tests pass before further development.
+
+3. **Push-Main Workflow**:
+   - Triggered on pushes to the `main` branch.
+   - Calls the reusable `test.yml` workflow to validate the code.
+   - After tests pass, deploys the project to Maven Central.
+
+### Workflow Directory
+
+- `.github/workflows/test.yml`: Contains the reusable test workflow.
+- `.github/workflows/push-develop.yml`: Calls the `test.yml` workflow for the `develop` branch.
+- `.github/workflows/push-main.yml`: Calls the `test.yml` workflow for the `main` branch and handles deployment.
+
 ## Future Plans
 As the Flashcard Generator Core continues to evolve, several exciting enhancements and new features are planned to improve its functionality and expand its capabilities.
 
@@ -121,6 +145,8 @@ As the Flashcard Generator Core continues to evolve, several exciting enhancemen
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any improvements or new features.
+
+The repository uses the Gitflow branching model.
 
 ## License
 This project is licensed under the MIT License.
