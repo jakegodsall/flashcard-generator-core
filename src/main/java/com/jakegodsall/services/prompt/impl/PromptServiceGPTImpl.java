@@ -41,6 +41,16 @@ public class PromptServiceGPTImpl implements PromptService {
     }
 
     @Override
+    public String generatePromptForMultipleFlashcards(String targetWord, FlashcardType flashcardType, Language language, Options options, int count) {
+        return "Generate " + count + " different flashcards as a JSON array. For each flashcard in the array:\n" +
+               generateBasePrompt() + getDescriptionOfContent(flashcardType) + 
+               "The structure for each flashcard in the array should be:\n" + 
+               getFlashcardStructure(flashcardType) + 
+               "The word is " + targetWord + " and the target language is " + language.getName() + ".\n" +
+               "Each flashcard should use different example sentences and translations while maintaining accuracy.\n";
+    }
+
+    @Override
     public String generatePromptForSubsequentWord(String targetWord) {
         return "The next word is " + targetWord;
     }
