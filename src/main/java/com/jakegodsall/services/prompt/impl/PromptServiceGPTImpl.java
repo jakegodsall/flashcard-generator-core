@@ -37,7 +37,11 @@ public class PromptServiceGPTImpl implements PromptService {
 
     @Override
     public String generatePrompt(String targetWord, FlashcardType flashcardType, Language language, Options options) {
-        return generateBasePrompt() + getDescriptionOfContent(flashcardType) + getFlashcardStructure(flashcardType) + "The word is " + targetWord + " and the target language is " + language.getName() + ".\n";
+        return generateBasePrompt() + 
+               getDescriptionOfContent(flashcardType) + 
+               getFlashcardStructure(flashcardType) + 
+               "The word is \"" + targetWord + "\" and the target language is " + language.getName() + ".\n" +
+               getFormattingRules();
     }
 
     @Override
@@ -48,7 +52,8 @@ public class PromptServiceGPTImpl implements PromptService {
                getFlashcardStructure(flashcardType) + 
                "The word is \"" + targetWord + "\" and the target language is " + language.getName() + ".\n" +
                "Each flashcard should use different example sentences and translations while maintaining accuracy.\n" +
-               "Remember: Every flashcard MUST use the exact word \"" + targetWord + "\" - not synonyms, not related words.\n";
+               "Remember: Every flashcard MUST use the exact word \"" + targetWord + "\" - not synonyms, not related words.\n" +
+               getFormattingRules();
     }
 
     @Override
@@ -74,5 +79,13 @@ public class PromptServiceGPTImpl implements PromptService {
             case SENTENCE -> SentenceFlashcard.JSON_STRUCTURE_FOR_PROMPT;
             default -> throw new IllegalArgumentException("Unsupported FlashcardType: " + flashcardType);
         };
+    }
+
+    private String getFormattingRules() {
+        return "Please follow these formatting rules:\n" +
+               "1. If the word is a verb in the infinitive form, prefix it with \"to \" in both native and target languages\n" +
+               "2. The native word and target word should be in lowercase\n" +
+               "3. Example sentences must start with a capital letter and end with a period\n" +
+               "4. Ensure proper sentence structure and punctuation in all example sentences\n";
     }
 }
