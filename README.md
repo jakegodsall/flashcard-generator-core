@@ -1,4 +1,3 @@
-
 # Flashcard Generator Core
 
 This project is the `flashcard-generator-core` library that uses the GPT API to create basic sentences using provided words in different languages.
@@ -12,6 +11,12 @@ The library supports various languages and can export the generated sentences to
 - Configuration for language-specific features via a JSON file.
 - Export generated flashcards to multiple file formats (CSV, JSON).
 - Easily extendable to support more languages.
+- Strict formatting rules for consistent and high-quality flashcards:
+  - Automatic "to" prefix for infinitive verbs in both languages
+  - Consistent capitalization (lowercase for vocabulary, proper sentence case for examples)
+  - Proper sentence punctuation
+  - Prevention of target word appearance in native language sentences
+- Support for generating multiple varied flashcards for the same word
 
 ## Requirements
 - Java 22 or higher
@@ -75,6 +80,33 @@ This flexibility allows developers to create applications that fit their specifi
 ### Flashcard Services
 
 1. **GPT Implementation** (`FlashcardServiceGPTImpl.java`): Currently the only flashcard service available is using the OpenAI API. The service uses a `PromptService` to generate the appropriate prompts to the API, `HttpClientService` to generate the HTTP request and handle the HTTP response, and a `JsonParseService` to parse the response under the hood.
+
+#### Flashcard Formatting Rules
+
+The library enforces strict formatting rules to ensure consistency and quality in generated flashcards:
+
+1. **Verb Handling**:
+   - Infinitive verbs are automatically prefixed with "to " in both native and target languages
+   - Example: "to run" / "to speak" / "to write"
+
+2. **Case Consistency**:
+   - Vocabulary words (both native and target) are always in lowercase
+   - Example sentences follow proper capitalization rules (start with capital letter)
+
+3. **Sentence Structure**:
+   - All example sentences must end with a period
+   - Proper sentence structure and punctuation are enforced
+
+4. **Word Usage in Sentences**:
+   - For sentence-based flashcards, the target word NEVER appears in the native language sentence
+   - Instead, appropriate translations or alternative phrasings are used
+   - This ensures proper learning without direct word repetition
+
+5. **Multiple Flashcard Generation**:
+   - When generating multiple flashcards for the same word, each flashcard:
+     - Uses exactly the same target word (no synonyms or related words)
+     - Provides different example sentences and contexts
+     - Maintains all formatting rules consistently
 
 ### Output Services
 
