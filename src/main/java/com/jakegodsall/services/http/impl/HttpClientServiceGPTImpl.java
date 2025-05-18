@@ -16,17 +16,32 @@ import java.nio.charset.StandardCharsets;
  * Implementation of HttpClientService for GPT-specific HTTP requests.
  */
 public class HttpClientServiceGPTImpl implements HttpClientService {
+    private static final String API_KEY_ENV_VAR = "OPENAI_API_KEY";
     private final CloseableHttpClient httpClient;
     private String BEARER_TOKEN;
 
     public HttpClientServiceGPTImpl(CloseableHttpClient httpClient) {
-        ApiKeyConfig apiKeyConfig = new ApiKeyConfigImpl();
-        try {
-            BEARER_TOKEN = apiKeyConfig.getApiKeyFromFile(ApiKeyConfigImpl.CONFIG_DIR);
-            System.out.println("BEARER TOKEN: " + BEARER_TOKEN);
-        } catch (Exception exception) {
-            System.err.println(exception.getMessage());
+        // First try to get API key from environment variable
+        BEARER_TOKEN = System.getenv(API_KEY_ENV_VAR);
+        
+        // If not found in environment, try to get from config file
+        if (BEARER_TOKEN == null || BEARER_TOKEN.trim().isEmpty()) {
+            try {
+                ApiKeyConfig apiKeyConfig = new ApiKeyConfigImpl();
+                BEARER_TOKEN = apiKeyConfig.getApiKeyFromFile(ApiKeyConfigImpl.CONFIG_DIR);
+                System.out.println("API key loaded from config file");
+            } catch (Exception e) {
+                System.err.println("Failed to load API key from file: " + e.getMessage());
+                throw new IllegalStateException("No API key found in environment or config file");
+            }
+        } else {
+            System.out.println("API key loaded from environment variable");
         }
+
+        if (BEARER_TOKEN == null || BEARER_TOKEN.trim().isEmpty()) {
+            throw new IllegalStateException("Failed to load API key from any source");
+        }
+
         this.httpClient = httpClient;
     }
 
@@ -55,4 +70,4 @@ public class HttpClientServiceGPTImpl implements HttpClientService {
     public void close() throws IOException {
         httpClient.close();
     }
-}
+} 
