@@ -24,4 +24,5 @@ jobs:
           docker build -t flashcard-generator-core .
           docker run --rm \
             -v "$(pwd)":/app \
-            flashcard-generator-core
+            flashcard-generator-core \
+            mvn clean test

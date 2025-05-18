@@ -50,7 +50,7 @@ public class JsonParseServiceGPTImpl implements JsonParseService {
         try {
             String content = parseContentFromResponse(responseBody);
 
-            // Parse the JSON int oa JsonNode tree
+            // Parse the JSON into a JsonNode tree
             JsonNode rootNode = objectMapper.readTree(content);
 
             // Delegate to specific parsing logic based on FlashcardType
@@ -62,6 +62,34 @@ public class JsonParseServiceGPTImpl implements JsonParseService {
         } catch (JsonProcessingException ex) {
             System.err.println(ex.getMessage());
             return null;
+        }
+    }
+
+    @Override
+    public List<Flashcard> parseMultipleFlashcards(String responseBody, FlashcardType flashcardType) {
+        try {
+            String content = parseContentFromResponse(responseBody);
+            JsonNode rootNode = objectMapper.readTree(content);
+
+            List<Flashcard> flashcards = new ArrayList<>();
+
+            if (!rootNode.isArray()) {
+                throw new NoSuchElementException("Expected an array of flashcards in the response");
+            }
+
+            for (JsonNode flashcardNode : rootNode) {
+                Flashcard flashcard = switch (flashcardType) {
+                    case WORD -> parseWordFlashcardFromJson(flashcardNode);
+                    case SENTENCE -> parseSentenceFlashcardFromJson(flashcardNode);
+                    default -> throw new IllegalArgumentException("Unsupported FlashcardType: " + flashcardType);
+                };
+                flashcards.add(flashcard);
+            }
+
+            return flashcards;
+        } catch (JsonProcessingException ex) {
+            System.err.println(ex.getMessage());
+            return List.of();
         }
     }
 

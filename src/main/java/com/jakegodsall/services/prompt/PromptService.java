@@ -36,6 +36,18 @@ public interface PromptService {
     String generatePrompt(String targetWord, FlashcardType flashcardType, Language language, Options options);
 
     /**
+     * Generates a prompt for multiple flashcards based on a single target word.
+     *
+     * @param targetWord the word in the target language that will be used to generate multiple flashcards.
+     * @param flashcardType the type of flashcard to generate.
+     * @param language the language in which the flashcard content will be generated.
+     * @param options additional options that influence the generation of the prompt.
+     * @param count the number of flashcards to generate.
+     * @return the generated prompt as a {@code String}, which will be sent to the API.
+     */
+    String generatePromptForMultipleFlashcards(String targetWord, FlashcardType flashcardType, Language language, Options options, int count);
+
+    /**
      * Creates a simple prompt for the next word in a sequence.
      *
      * <p>This method generates a basic prompt that includes the given word, typically used for

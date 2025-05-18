@@ -15,7 +15,6 @@ import java.io.IOException;
  * </ul>
  * Both operations can handle various exceptions related to missing API keys or
  * file access issues.
- * </p>
  *
  */
 public interface ApiKeyConfig {

@@ -32,4 +32,13 @@ public interface JsonParseService {
      * @return a parsed {@link Flashcard} object.
      */
     Flashcard parseFlashcard(String responseBody, FlashcardType flashcardType);
+
+    /**
+     * Parses multiple flashcards from a single API response.
+     *
+     * @param responseBody the raw JSON response from the API containing multiple flashcards.
+     * @param flashcardType the type of flashcards to create, defined by the {@link FlashcardType} enum.
+     * @return a list of parsed {@link Flashcard} objects.
+     */
+    List<Flashcard> parseMultipleFlashcards(String responseBody, FlashcardType flashcardType);
 }

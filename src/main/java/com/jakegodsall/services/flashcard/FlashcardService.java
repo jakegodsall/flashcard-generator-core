@@ -33,6 +33,18 @@ public interface FlashcardService {
     Flashcard generateFlashcard(String targetWord, FlashcardType flashcardType, Language language, Options options);
 
     /**
+     * Generates multiple flashcards for a single target word in one API call.
+     *
+     * @param targetWord the word for which multiple flashcards are generated
+     * @param flashcardType the type of the flashcards (e.g., multiple choice, fill-in-the-blank)
+     * @param language the language of the flashcards
+     * @param options additional options to customize flashcard generation
+     * @param count the number of flashcards to generate
+     * @return a list of generated flashcards
+     */
+    List<Flashcard> generateMultipleFlashcardsForWord(String targetWord, FlashcardType flashcardType, Language language, Options options, int count);
+
+    /**
      * Generates flashcards interactively by prompting the user for words until they exit.
      *
      * @param flashcardType the type of flashcards (e.g., multiple choice, fill-in-the-blank)

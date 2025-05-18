@@ -73,6 +73,27 @@ public class FlashcardServiceGPTImpl implements FlashcardService {
     }
 
     @Override
+    public List<Flashcard> generateMultipleFlashcardsForWord(String targetWord, FlashcardType flashcardType, Language language, Options options, int count) {
+        try {
+            // Generate the prompt for multiple flashcards
+            String prompt = promptGenerator.generatePromptForMultipleFlashcards(targetWord, flashcardType, language, options, count);
+            // Generate HTTP POST request body
+            String requestBody = promptGenerator.generateRequestBody(prompt);
+            // Send the POST request to the GPT API
+            HttpResponse response = httpClientService.sendPostRequest(API_CHAT_URL, requestBody);
+            // Get the result
+            HttpEntity responseEntity = response.getEntity();
+            String result = EntityUtils.toString(responseEntity);
+            // Parse multiple flashcards from the result
+            return jsonParseService.parseMultipleFlashcards(result, flashcardType);
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            System.err.println(ex.getMessage());
+            return List.of();
+        }
+    }
+
+    @Override
     public List<Flashcard> generateFlashcardsInteractively(FlashcardType flashcardType, Language language, Options options) throws IOException {
         List<Flashcard> flashcards = new ArrayList<>();
 

@@ -1,0 +1,1 @@
+mvn install -Dmaven.javadoc.skip=true -Dgpg.skip=true
