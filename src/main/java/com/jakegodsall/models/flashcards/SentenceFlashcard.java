@@ -21,31 +21,31 @@ import com.jakegodsall.utils.StringUtils;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
-@JsonPropertyOrder({ "nativeSentence", "targetSentence" })
+@JsonPropertyOrder({ "sourceSentence", "targetSentence" })
 public class SentenceFlashcard extends Flashcard {
     /**
      * A description of the flashcard's content.
      */
-    public static final String DESCRIPTION_OF_CONTENT = "A basic sentence in the native English language, and that sentence translated into the target language";
+    public static final String DESCRIPTION_OF_CONTENT = "A basic sentence in the source language, and that sentence translated into the target language";
 
     /**
      * A JSON structure template for creating flashcards.
      * It uses the {@link StringUtils#createJsonComponent} utility to generate the components.
      */
     public static final String JSON_STRUCTURE_FOR_PROMPT = "{\n" +
-        StringUtils.createJsonComponent("nativeSentence", "<sentence in native English language>") + ",\n" +
+        StringUtils.createJsonComponent("sourceSentence", "<sentence in source language>") + ",\n" +
         StringUtils.createJsonComponent("targetSentence", "<sentence in target language>") + "\n" +
         "}\n";
 
     /**
-     * The sentence in the native language (e.g., English).
+     * The sentence in the source language.
      */
-    @CsvBindByName(column = "nativeSentence")
+    @CsvBindByName(column = "sourceSentence")
     @CsvBindByPosition(position = 0)
-    private String nativeSentence;
+    private String sourceSentence;
 
     /**
-     * The sentence translated into the target language.
+     * The sentence in the target language.
      */
     @CsvBindByName(column = "targetSentence")
     @CsvBindByPosition(position = 1)
@@ -53,10 +53,10 @@ public class SentenceFlashcard extends Flashcard {
 
     /**
      * Returns a string representation of the flashcard,
-     * displaying the native and target sentences.
+     * displaying the source and target sentences.
      */
     @Override
     public String toString() {
-        return nativeSentence + ", " + targetSentence;
+        return sourceSentence + ", " + targetSentence;
     }
 }

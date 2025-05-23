@@ -25,29 +25,29 @@ import com.jakegodsall.utils.StringUtils;
 @Setter
 @EqualsAndHashCode(callSuper = false)
 @Builder
-@JsonPropertyOrder({ "nativeWord", "targetWord", "exampleTargetSentence" })
+@JsonPropertyOrder({ "sourceWord", "targetWord", "exampleTargetSentence" })
 public class WordFlashcard extends Flashcard {
     /**
      * A description of the flashcard's content,
      */
-    public static final String DESCRIPTION_OF_CONTENT = "The word translated into the native language of English, the word itself, and a very basic sentence using the target word in the target language";
+    public static final String DESCRIPTION_OF_CONTENT = "The word translated into the source language, the word itself, and a very basic sentence using the target word in the target language";
 
     /**
      * A JSON structure template for creating flashcards.
      * It uses the {@link StringUtils#createJsonComponent} utility to generate the components.
      */
     public static final String JSON_STRUCTURE_FOR_PROMPT = "{\n" +
-        StringUtils.createJsonComponent("nativeWord", "<word in native language>") + ",\n" +
+        StringUtils.createJsonComponent("sourceWord", "<word in source language>") + ",\n" +
         StringUtils.createJsonComponent("targetWord", "<word in target language>") + ",\n" +
         StringUtils.createJsonComponent("targetSentence", "<sentence in target language>") + "\n" +
         "}\n";
 
     /**
-     * The word in the native language (e.g., English).
+     * The word in the source language.
      */
-    @CsvBindByName(column = "nativeWord")
+    @CsvBindByName(column = "sourceWord")
     @CsvBindByPosition(position = 0)
-    String nativeWord;
+    String sourceWord;
 
     /**
      * The word in the target language.
@@ -65,12 +65,12 @@ public class WordFlashcard extends Flashcard {
 
     /**
      * Returns a string representation of the flashcard,
-     * combining the native word, target word, and example sentence.
+     * combining the source word, target word, and example sentence.
      *
      * @return a string representation of the flashcard content.
      */
     @Override
     public String toString() {
-        return nativeWord + " - " + targetWord + " - " + exampleTargetSentence;
+        return sourceWord + " - " + targetWord + " - " + exampleTargetSentence;
     }
 }
