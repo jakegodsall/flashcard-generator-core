@@ -36,16 +36,16 @@ public class PromptServiceGPTImpl implements PromptService {
     }
 
     @Override
-    public String generatePrompt(String targetWord, FlashcardType flashcardType, Language language, Options options) {
+    public String generatePrompt(String targetWord, FlashcardType flashcardType, Language sourceLanguage, Language targetLanguage, Options options) {
         return generateBasePrompt() + 
                getDescriptionOfContent(flashcardType) + 
                getFlashcardStructure(flashcardType) + 
-               "The word is \"" + targetWord + "\" and the target language is " + language.getName() + ".\n" +
+               "The word in the source language is \"" + targetWord + "\" and the target language is " + targetLanguage.getName() + ".\n" +
                getFormattingRules();
     }
 
-    @Override
-    public String generatePromptForMultipleFlashcards(String targetWord, FlashcardType flashcardType, Language language, Options options, int count) {
+    @Override   
+    public String generatePromptForMultipleFlashcards(String targetWord, FlashcardType flashcardType, Language sourceLanguage, Language targetLanguage, Options options, int count) {
         StringBuilder prompt = new StringBuilder();
         
         // Initial warning about target word usage
@@ -54,6 +54,9 @@ public class PromptServiceGPTImpl implements PromptService {
                   .append(targetWord)
                   .append("\" in the native language sentences. Instead, use its translation or rephrase the sentence completely.\n\n");
         }
+
+        prompt.append("You are a language learning assistant.\n")
+              .append("You are given a word in a target language and you need to generate flashcards for it.\n")
         
         prompt.append("Generate ")
               .append(count)
@@ -64,10 +67,10 @@ public class PromptServiceGPTImpl implements PromptService {
               .append(getDescriptionOfContent(flashcardType))
               .append("The structure for each flashcard in the array should be:\n")
               .append(getFlashcardStructure(flashcardType))
-              .append("The word is \"")
+              .append("The word in the source language is \"")
               .append(targetWord)
               .append("\" and the target language is ")
-              .append(language.getName())
+              .append(targetLanguage.getName())
               .append(".\n");
 
         if (flashcardType == FlashcardType.SENTENCE) {
@@ -75,12 +78,12 @@ public class PromptServiceGPTImpl implements PromptService {
                   .append("1. The word \"")
                   .append(targetWord)
                   .append("\" MUST ONLY appear in the target language sentence\n")
-                  .append("2. The native language sentence MUST NOT contain \"")
+                  .append("2. The source language sentence MUST NOT contain \"")
                   .append(targetWord)
                   .append("\" - use its translation instead\n")
                   .append("3. If you're tempted to use \"")
                   .append(targetWord)
-                  .append("\" in the native sentence, STOP and rephrase it\n\n");
+                  .append("\" in the source sentence, STOP and rephrase it\n\n");
         }
 
         prompt.append("Each flashcard should use different example sentences and translations while maintaining accuracy.\n")
@@ -119,11 +122,11 @@ public class PromptServiceGPTImpl implements PromptService {
 
     private String getFormattingRules() {
         return "Please follow these formatting rules:\n" +
-               "1. If the word is a verb in the infinitive form, prefix it with \"to \" in both native and target languages\n" +
-               "2. The native word and target word should be in lowercase\n" +
+               "1. If the word is a verb in the infinitive form, prefix it with \"to \" in both source and target languages\n" +
+               "2. The source word and target word should be in lowercase\n" +
                "3. Example sentences must start with a capital letter and end with a period\n" +
                "4. Ensure proper sentence structure and punctuation in all example sentences\n" +
-               "5. STRICT RULE FOR SENTENCE FLASHCARDS: The target word MUST NEVER appear in the native language sentence - ALWAYS use a translation or completely different phrasing\n" +
-               "6. Double-check every native sentence to ensure it does not contain the target word in any form\n";
+               "5. STRICT RULE FOR SENTENCE FLASHCARDS: The target word MUST NEVER appear in the source language sentence - ALWAYS use a translation or completely different phrasing\n" +
+               "6. Double-check every source sentence to ensure it does not contain the target word in any form\n";
     }
 }

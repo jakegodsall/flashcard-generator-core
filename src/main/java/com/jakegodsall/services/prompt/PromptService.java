@@ -29,23 +29,25 @@ public interface PromptService {
      *
      * @param targetWord the word in the target language that will be used to generate the flashcard.
      * @param flashcardType the type of flashcard to generate, as defined by the {@link FlashcardType} enumeration (e.g., WORD, SENTENCE).
-     * @param language the language in which the flashcard content will be generated.
+     * @param sourceLanguage the language in which the flashcard content will be generated.
+     * @param targetLanguage the language in which the flashcard content will be generated.
      * @param options additional options that influence the generation of the prompt, such as difficulty level or specific grammatical features.
      * @return the generated prompt as a {@code String}, which will be sent to the API.
      */
-    String generatePrompt(String targetWord, FlashcardType flashcardType, Language language, Options options);
+    String generatePrompt(String targetWord, FlashcardType flashcardType, Language sourceLanguage, Language targetLanguage, Options options);
 
     /**
      * Generates a prompt for multiple flashcards based on a single target word.
      *
      * @param targetWord the word in the target language that will be used to generate multiple flashcards.
      * @param flashcardType the type of flashcard to generate.
-     * @param language the language in which the flashcard content will be generated.
+     * @param sourceLanguage the language in which the flashcard content will be generated.
+     * @param targetLanguage the language in which the flashcard content will be generated.
      * @param options additional options that influence the generation of the prompt.
      * @param count the number of flashcards to generate.
      * @return the generated prompt as a {@code String}, which will be sent to the API.
      */
-    String generatePromptForMultipleFlashcards(String targetWord, FlashcardType flashcardType, Language language, Options options, int count);
+    String generatePromptForMultipleFlashcards(String targetWord, FlashcardType flashcardType, Language sourceLanguage, Language targetLanguage, Options options, int count);
 
     /**
      * Creates a simple prompt for the next word in a sequence.
