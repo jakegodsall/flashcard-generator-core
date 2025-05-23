@@ -40,7 +40,7 @@ public class PromptServiceGPTImpl implements PromptService {
         return generateBasePrompt() + 
                getDescriptionOfContent(flashcardType) + 
                getFlashcardStructure(flashcardType) + 
-               "The word in the source language is \"" + targetWord + "\" and the target language is " + targetLanguage.getName() + ".\n" +
+               "The word in the target language is \"" + targetWord + "\" and the target language is " + targetLanguage.getName() + ".\n" +
                getFormattingRules();
     }
 
@@ -52,44 +52,35 @@ public class PromptServiceGPTImpl implements PromptService {
         if (flashcardType == FlashcardType.SENTENCE) {
             prompt.append("⚠️ CRITICAL REQUIREMENT: When generating sentences, you must NEVER use the word \"")
                   .append(targetWord)
-                  .append("\" in the native language sentences. Instead, use its translation or rephrase the sentence completely.\n\n");
+                  .append("\" in the source language sentences. Instead, use its translation or rephrase the sentence completely.\n\n");
         }
 
         prompt.append("You are a language learning assistant.\n")
-              .append("You are given a word in a target language and you need to generate flashcards for it.\n");
+              .append("You are given a word in the target language (").append(targetLanguage.getName()).append(") and you need to generate flashcards for it.\n")
+              .append("First, translate the target word \"").append(targetWord).append("\" to the source language (").append(sourceLanguage.getName()).append(").\n")
+              .append("This translation will be used consistently across all flashcards.\n\n");
         
         prompt.append("Generate ")
               .append(count)
               .append(" different flashcards as a JSON array. IMPORTANT: Each flashcard MUST use EXACTLY the word \"")
               .append(targetWord)
-              .append("\" - do not use synonyms or related words.\n")
+              .append("\" in the target language - do not use synonyms or related words.\n")
               .append(generateBasePrompt())
               .append(getDescriptionOfContent(flashcardType))
               .append("The structure for each flashcard in the array should be:\n")
               .append(getFlashcardStructure(flashcardType))
-              .append("The word in the source language is \"")
+              .append(giveExampleSentence())
+              .append("The word in the target language is \"")
               .append(targetWord)
-              .append("\" and the target language is ")
-              .append(targetLanguage.getName())
+              .append("\" (").append(targetLanguage.getName()).append(") and needs to be translated to ")
+              .append(sourceLanguage.getName())
               .append(".\n");
-
-        if (flashcardType == FlashcardType.SENTENCE) {
-            prompt.append("\nABSOLUTELY ESSENTIAL:\n")
-                  .append("1. The word \"")
-                  .append(targetWord)
-                  .append("\" MUST ONLY appear in the target language sentence\n")
-                  .append("2. The source language sentence MUST NOT contain \"")
-                  .append(targetWord)
-                  .append("\" - use its translation instead\n")
-                  .append("3. If you're tempted to use \"")
-                  .append(targetWord)
-                  .append("\" in the source sentence, STOP and rephrase it\n\n");
-        }
 
         prompt.append("Each flashcard should use different example sentences and translations while maintaining accuracy.\n")
               .append("Remember: Every flashcard MUST use the exact word \"")
               .append(targetWord)
-              .append("\" - not synonyms, not related words.\n")
+              .append("\" in the target language - not synonyms, not related words.\n")
+              .append("The source language translation of this word should be consistent across all flashcards.\n")
               .append(getFormattingRules());
 
         return prompt.toString();
@@ -122,11 +113,21 @@ public class PromptServiceGPTImpl implements PromptService {
 
     private String getFormattingRules() {
         return "Please follow these formatting rules:\n" +
-               "1. If the word is a verb in the infinitive form, prefix it with \"to \" in both source and target languages\n" +
+               "1. First, translate the target word to the source language and use this translation consistently across all flashcards\n" +
                "2. The source word and target word should be in lowercase\n" +
                "3. Example sentences must start with a capital letter and end with a period\n" +
                "4. Ensure proper sentence structure and punctuation in all example sentences\n" +
-               "5. STRICT RULE FOR SENTENCE FLASHCARDS: The target word MUST NEVER appear in the source language sentence - ALWAYS use a translation or completely different phrasing\n" +
+               "5. STRICT RULE FOR SENTENCE FLASHCARDS: The target word MUST NEVER appear in the source language sentence - ALWAYS use its translation or completely different phrasing\n" +
                "6. Double-check every source sentence to ensure it does not contain the target word in any form\n";
+    }
+
+    private String giveExampleSentence() {
+        return "I will now give you an example sentence.\n" +
+               "Let's say the source language is English and the target language is Spanish.\n" +
+               "The source word is \"book\" and the target word is \"libro\".\n" +
+               "The example sentence is \"The book is on the table\".\n" +
+               "The target sentence is \"El libro está en la mesa\".\n" +
+               "The source sentence is \"The book is on the table\".\n" +
+               "The target sentence is \"El libro está en la mesa\".\n";
     }
 }

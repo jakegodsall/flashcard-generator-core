@@ -37,9 +37,9 @@ public class WordFlashcard extends Flashcard {
      * It uses the {@link StringUtils#createJsonComponent} utility to generate the components.
      */
     public static final String JSON_STRUCTURE_FOR_PROMPT = "{\n" +
-        StringUtils.createJsonComponent("sourceWord", "<word in source language>") + ",\n" +
+        StringUtils.createJsonComponent("sourceWord", "<word translated into source language>") + ",\n" +
         StringUtils.createJsonComponent("targetWord", "<word in target language>") + ",\n" +
-        StringUtils.createJsonComponent("targetSentence", "<sentence in target language>") + "\n" +
+        StringUtils.createJsonComponent("targetSentence", "<sentence in target language using the target word>") + "\n" +
         "}\n";
 
     /**

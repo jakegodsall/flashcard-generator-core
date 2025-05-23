@@ -33,8 +33,8 @@ public class SentenceFlashcard extends Flashcard {
      * It uses the {@link StringUtils#createJsonComponent} utility to generate the components.
      */
     public static final String JSON_STRUCTURE_FOR_PROMPT = "{\n" +
-        StringUtils.createJsonComponent("sourceSentence", "<sentence in source language>") + ",\n" +
-        StringUtils.createJsonComponent("targetSentence", "<sentence in target language>") + "\n" +
+        StringUtils.createJsonComponent("sourceSentence", "<sentence translated into source language using the target word>") + ",\n" +
+        StringUtils.createJsonComponent("targetSentence", "<sentence in target language using the target word>") + "\n" +
         "}\n";
 
     /**
