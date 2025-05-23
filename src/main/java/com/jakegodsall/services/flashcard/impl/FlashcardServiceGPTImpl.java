@@ -52,10 +52,10 @@ public class FlashcardServiceGPTImpl implements FlashcardService {
     }
 
     @Override
-    public Flashcard generateFlashcard(String targetWord, FlashcardType flashcardType, Language language, Options options) {
+    public Flashcard generateFlashcard(String targetWord, FlashcardType flashcardType, Language sourceLanguage, Language targetLanguage, Options options) {
         try {
             // Generate the prompt based on the flashcard type
-            String prompt = promptGenerator.generatePrompt(targetWord, flashcardType, language, options);
+            String prompt = promptGenerator.generatePrompt(targetWord, flashcardType, sourceLanguage, targetLanguage, options);
             // Generate HTTP POST request body
             String requestBody = promptGenerator.generateRequestBody(prompt);
             // Send the POST request to the GPT API
@@ -73,10 +73,10 @@ public class FlashcardServiceGPTImpl implements FlashcardService {
     }
 
     @Override
-    public List<Flashcard> generateMultipleFlashcardsForWord(String targetWord, FlashcardType flashcardType, Language language, Options options, int count) {
+    public List<Flashcard> generateMultipleFlashcardsForWord(String targetWord, FlashcardType flashcardType, Language sourceLanguage, Language targetLanguage, Options options, int count) {
         try {
             // Generate the prompt for multiple flashcards
-            String prompt = promptGenerator.generatePromptForMultipleFlashcards(targetWord, flashcardType, language, options, count);
+            String prompt = promptGenerator.generatePromptForMultipleFlashcards(targetWord, flashcardType, sourceLanguage, targetLanguage, options, count);
             // Generate HTTP POST request body
             String requestBody = promptGenerator.generateRequestBody(prompt);
             // Send the POST request to the GPT API
@@ -94,7 +94,7 @@ public class FlashcardServiceGPTImpl implements FlashcardService {
     }
 
     @Override
-    public List<Flashcard> generateFlashcardsInteractively(FlashcardType flashcardType, Language language, Options options) throws IOException {
+    public List<Flashcard> generateFlashcardsInteractively(FlashcardType flashcardType, Language sourceLanguage, Language targetLanguage, Options options) throws IOException {
         List<Flashcard> flashcards = new ArrayList<>();
 
         // Instantiate the interactive mode input service
@@ -118,7 +118,7 @@ public class FlashcardServiceGPTImpl implements FlashcardService {
             }
 
             // Otherwise generate the flashcard and ad it to the List
-            Flashcard flashcard = generateFlashcard(input, flashcardType, language, options);
+            Flashcard flashcard = generateFlashcard(input, flashcardType, sourceLanguage, targetLanguage, options);
             flashcards.add(flashcard);
 
             System.out.println(flashcard);
@@ -130,7 +130,7 @@ public class FlashcardServiceGPTImpl implements FlashcardService {
     }
 
     @Override
-    public List<Flashcard> generateFlashcardsSequentially(List<String> targetWords, FlashcardType flashcardType, Language language, Options options) {
+    public List<Flashcard> generateFlashcardsSequentially(List<String> targetWords, FlashcardType flashcardType, Language sourceLanguage, Language targetLanguage, Options options) {
         List<Flashcard> flashcards = new ArrayList<>();
 
         // Track the start time
@@ -138,7 +138,7 @@ public class FlashcardServiceGPTImpl implements FlashcardService {
 
         // Iterate through words, generate flashcards and store them in the List<Flashcard>
         for (int i = 0; i < targetWords.size(); i++) {
-            flashcards.add(generateFlashcard(targetWords.get(i), flashcardType, language, options));
+            flashcards.add(generateFlashcard(targetWords.get(i), flashcardType, sourceLanguage, targetLanguage, options));
             System.out.println("Flashcard " + (i + 1) + " of " + targetWords.size() + " generated.");
         }
 
@@ -152,14 +152,14 @@ public class FlashcardServiceGPTImpl implements FlashcardService {
     }
 
     @Override
-    public List<Flashcard> generateFlashcardsConcurrently(List<String> targetWords, FlashcardType flashcardType, Language language, Options options) throws InterruptedException, ExecutionException {
+    public List<Flashcard> generateFlashcardsConcurrently(List<String> targetWords, FlashcardType flashcardType, Language sourceLanguage, Language targetLanguage, Options options) throws InterruptedException, ExecutionException {
         List<Future<Flashcard>> futures = new ArrayList<>();
 
         long startTime = System.currentTimeMillis();
 
         // Submit a task for each word and inform the client
         for (String targetWord : targetWords) {
-            futures.add(executorService.submit(() -> generateFlashcard(targetWord, flashcardType, language, options)));
+            futures.add(executorService.submit(() -> generateFlashcard(targetWord, flashcardType, sourceLanguage, targetLanguage, options)));
         }
 
         System.out.println("All tasks submitted. Waiting for results...");

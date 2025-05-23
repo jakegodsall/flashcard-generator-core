@@ -29,7 +29,7 @@ class OutputServiceJsonModeTest {
         String result = outputService.serialiseToOutputFormat(testFlashcards);
 
         assertThat(result)
-                .isEqualTo("[{\"nativeWord\":\"book\",\"targetWord\":\"libro\",\"exampleTargetSentence\":\"El libro.\"},{\"nativeWord\":\"car\",\"targetWord\":\"coche\",\"exampleTargetSentence\":\"El coche.\"}]");
+                .isEqualTo("[{\"sourceWord\":\"book\",\"targetWord\":\"libro\",\"exampleTargetSentence\":\"El libro.\"},{\"sourceWord\":\"car\",\"targetWord\":\"coche\",\"exampleTargetSentence\":\"El coche.\"}]");
     }
 
     @Test
@@ -44,12 +44,12 @@ class OutputServiceJsonModeTest {
     private List<Flashcard> generateDummyFlashcardList() {
         List<Flashcard> flashcards = new ArrayList<>();
         flashcards.add(WordFlashcard.builder()
-                .nativeWord("book")
+                .sourceWord("book")
                 .targetWord("libro")
                 .exampleTargetSentence("El libro.")
                 .build());
         flashcards.add(WordFlashcard.builder()
-                .nativeWord("car")
+                .sourceWord("car")
                 .targetWord("coche")
                 .exampleTargetSentence("El coche.")
                 .build());

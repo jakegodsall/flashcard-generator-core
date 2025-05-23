@@ -56,7 +56,7 @@ public class PromptServiceGPTImpl implements PromptService {
         }
 
         prompt.append("You are a language learning assistant.\n")
-              .append("You are given a word in a target language and you need to generate flashcards for it.\n")
+              .append("You are given a word in a target language and you need to generate flashcards for it.\n");
         
         prompt.append("Generate ")
               .append(count)

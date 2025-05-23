@@ -97,12 +97,12 @@ public class JsonParseServiceGPTImpl implements JsonParseService {
      * Parses a WordFlashcard from the given JsonNode.
      */
     private WordFlashcard parseWordFlashcardFromJson(JsonNode rootNode) {
-        JsonNode nativeWordNode = getJsonNode(rootNode, "nativeWord");
+        JsonNode sourceWordNode = getJsonNode(rootNode, "sourceWord");
         JsonNode targetWordNode = getJsonNode(rootNode, "targetWord");
         JsonNode targetSentenceNode = getJsonNode(rootNode, "targetSentence");
 
         return new WordFlashcard(
-                nativeWordNode.asText(),
+                sourceWordNode.asText(),
                 targetWordNode.asText(),
                 targetSentenceNode.asText()
         );
@@ -112,11 +112,11 @@ public class JsonParseServiceGPTImpl implements JsonParseService {
      * Parses a SentenceFlashcard from the given JsonNode.
      */
     private SentenceFlashcard parseSentenceFlashcardFromJson(JsonNode rootNode) {
-        JsonNode nativeSentenceNode = getJsonNode(rootNode, "nativeSentence");
+        JsonNode sourceSentenceNode = getJsonNode(rootNode, "sourceSentence");
         JsonNode targetSentenceNode = getJsonNode(rootNode, "targetSentence");
 
         return new SentenceFlashcard(
-                nativeSentenceNode.asText(),
+                sourceSentenceNode.asText(),
                 targetSentenceNode.asText()
         );
     }

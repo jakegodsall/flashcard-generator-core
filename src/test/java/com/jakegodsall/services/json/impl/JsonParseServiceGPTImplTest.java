@@ -28,7 +28,7 @@ class JsonParseServiceGPTImplTest {
     // PARSE WORD FLASHCARD
 
     @Test
-    public void parseWordFlashcard_missingNativeWordField() throws Exception {
+    public void parseWordFlashcard_missingSourceWordField() throws Exception {
         String responseBody = "{ \"choices\": [{ \"message\": { \"content\": " +
                 "{ \"targetWord\": \"Hola\", \"targetSentence\": \"Hola, ¿cómo estás?\" }" +
                 "} }] }";
@@ -37,7 +37,7 @@ class JsonParseServiceGPTImplTest {
         NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> {
             jsonParseService.parseFlashcard(responseBody, FlashcardType.WORD);
         });
-        assertEquals("Missing 'nativeWord' field in the JSON response", exception.getMessage());
+        assertEquals("Missing 'sourceWord' field in the JSON response", exception.getMessage());
     }
 
     @Test
