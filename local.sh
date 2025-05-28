@@ -4,4 +4,4 @@
 sdk use java 21.0.7-tem
 
 # Build the project
-mvn install -Dmaven.javadoc.skip=true -Dgpg.skip=true
+mvn clean install -Dmaven.javadoc.skip=true -Dgpg.skip=true
