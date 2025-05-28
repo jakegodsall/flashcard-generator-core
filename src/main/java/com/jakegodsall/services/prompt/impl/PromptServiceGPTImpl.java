@@ -76,33 +76,46 @@ public class PromptServiceGPTImpl implements PromptService {
         prompt.append("- Source language: ").append(sourceLanguage.getName()).append("\n");
         prompt.append("- Target language: ").append(targetLanguage.getName()).append("\n\n");
         
-        prompt.append("STEP 1: TRANSLATE THE TARGET WORD\n");
+        prompt.append("🔥 CRITICAL CONSISTENCY REQUIREMENT 🔥\n");
+        prompt.append("STEP 1: TRANSLATE THE TARGET WORD ONCE\n");
         prompt.append("First, translate \"").append(targetWord).append("\" from ").append(targetLanguage.getName())
               .append(" to ").append(sourceLanguage.getName()).append(".\n");
-        prompt.append("This translation will be your SOURCE WORD for all flashcards.\n\n");
+        prompt.append("This translation will be your SINGLE, CONSISTENT SOURCE WORD for ALL ").append(count).append(" flashcards.\n");
+        prompt.append("❌ DO NOT use different translations, synonyms, or related words for different flashcards!\n");
+        prompt.append("✅ USE THE EXACT SAME SOURCE WORD in every single flashcard!\n\n");
         
         prompt.append("COMPONENT RULES:\n");
         if (components.stream().anyMatch(c -> c instanceof SourceLanguageWord)) {
-            prompt.append("- sourceWord: Use ONLY the ").append(sourceLanguage.getName()).append(" translation of \"").append(targetWord).append("\"\n");
+            prompt.append("- sourceWord: Use the EXACT SAME ").append(sourceLanguage.getName()).append(" translation of \"").append(targetWord).append("\" in ALL ").append(count).append(" flashcards\n");
+            prompt.append("  ⚠️ This field must be IDENTICAL across all flashcards!\n");
         }
         if (components.stream().anyMatch(c -> c instanceof TargetLanguageWord)) {
-            prompt.append("- targetWord: Use ONLY the exact word \"").append(targetWord).append("\" (").append(targetLanguage.getName()).append(")\n");
+            prompt.append("- targetWord: Use the exact word \"").append(targetWord).append("\" (").append(targetLanguage.getName()).append(") in ALL ").append(count).append(" flashcards\n");
+            prompt.append("  ⚠️ This field must be IDENTICAL across all flashcards!\n");
         }
         if (components.stream().anyMatch(c -> c instanceof SourceLanguageSentence)) {
             prompt.append("- sourceSentence: Write ENTIRELY in ").append(sourceLanguage.getName())
-                  .append(", using the ").append(sourceLanguage.getName()).append(" translation of \"").append(targetWord).append("\"\n");
+                  .append(", using the SAME ").append(sourceLanguage.getName()).append(" translation of \"").append(targetWord).append("\" in every flashcard\n");
             prompt.append("  ❌ NEVER use \"").append(targetWord).append("\" in source sentences!\n");
+            prompt.append("  ❌ NEVER use synonyms or different translations of \"").append(targetWord).append("\"!\n");
         }
         if (components.stream().anyMatch(c -> c instanceof TargetLanguageSentence)) {
             prompt.append("- targetSentence: Write ENTIRELY in ").append(targetLanguage.getName())
-                  .append(", using the exact word \"").append(targetWord).append("\"\n");
+                  .append(", using the exact word \"").append(targetWord).append("\" in every flashcard\n");
         }
         prompt.append("\n");
+
+        prompt.append("🎯 WORD CONSISTENCY EXAMPLES:\n");
+        prompt.append("If translating \"").append(targetWord).append("\" to ").append(sourceLanguage.getName()).append(" gives you \"example_translation\":\n");
+        prompt.append("✅ CORRECT: All flashcards use sourceWord: \"example_translation\"\n");
+        prompt.append("❌ WRONG: Flashcard 1 uses \"example_translation\", Flashcard 2 uses \"synonym_word\"\n");
+        prompt.append("❌ WRONG: Using related words instead of the direct translation\n\n");
 
         prompt.append("You are a language learning assistant.\n")
               .append("Generate ").append(count).append(" different flashcards as a JSON array.\n")
               .append("IMPORTANT: Each flashcard MUST use EXACTLY the word \"").append(targetWord)
-              .append("\" in target language components - no synonyms or related words.\n\n")
+              .append("\" in target language components - no synonyms or related words.\n")
+              .append("CRITICAL: The sourceWord field must be IDENTICAL in all ").append(count).append(" flashcards!\n\n")
               .append(generateBasePrompt())
               .append(getComponentsDescription(components))
               .append(getLanguageSpecificInstructions(components, sourceLanguage, targetLanguage))
@@ -113,10 +126,11 @@ public class PromptServiceGPTImpl implements PromptService {
               .append("\" (").append(targetLanguage.getName()).append(") and needs to be translated to ")
               .append(sourceLanguage.getName()).append(".\n");
 
-        prompt.append("Each flashcard should use different example sentences while maintaining accuracy.\n")
-              .append("Remember: Every flashcard MUST use the exact word \"").append(targetWord)
-              .append("\" in target language components - not synonyms, not related words.\n")
-              .append("The source language translation of this word should be consistent across all flashcards.\n")
+        prompt.append("FINAL REMINDERS:\n")
+              .append("- Each flashcard should use different example sentences while maintaining accuracy\n")
+              .append("- Every flashcard MUST use the exact word \"").append(targetWord).append("\" in target language components\n")
+              .append("- The sourceWord field must be IDENTICAL across all ").append(count).append(" flashcards\n")
+              .append("- Only the sentences should vary between flashcards, NOT the word translations\n")
               .append(getFormattingRules());
 
         return prompt.toString();
@@ -181,13 +195,24 @@ public class PromptServiceGPTImpl implements PromptService {
     }
 
     private String giveExampleSentence() {
-        return "EXAMPLE TO CLARIFY:\n" +
+        return "EXAMPLE TO CLARIFY CONSISTENCY:\n" +
                "If source language is English and target language is Spanish:\n" +
-               "- Target word: \"libro\" (Spanish)\n" +
-               "- Source word: \"book\" (English translation)\n" +
-               "- sourceSentence: \"The book is on the table\" (English, using \"book\")\n" +
-               "- targetSentence: \"El libro está en la mesa\" (Spanish, using \"libro\")\n" +
-               "❌ WRONG: sourceSentence: \"The libro is on the table\" (mixing languages)\n" +
-               "❌ WRONG: targetSentence: \"El book está en la mesa\" (mixing languages)\n\n";
+               "- Target word: \"libro\" (Spanish) - SAME in all flashcards\n" +
+               "- Source word: \"book\" (English translation) - SAME in all flashcards\n\n" +
+               "FLASHCARD 1:\n" +
+               "- sourceWord: \"book\" ✅\n" +
+               "- targetWord: \"libro\" ✅\n" +
+               "- sourceSentence: \"The book is on the table\" ✅\n" +
+               "- targetSentence: \"El libro está en la mesa\" ✅\n\n" +
+               "FLASHCARD 2:\n" +
+               "- sourceWord: \"book\" ✅ (SAME as flashcard 1)\n" +
+               "- targetWord: \"libro\" ✅ (SAME as flashcard 1)\n" +
+               "- sourceSentence: \"I read a good book yesterday\" ✅ (DIFFERENT sentence, SAME word)\n" +
+               "- targetSentence: \"Leí un buen libro ayer\" ✅ (DIFFERENT sentence, SAME word)\n\n" +
+               "❌ WRONG EXAMPLES:\n" +
+               "- sourceWord: \"novel\" (different word - should be \"book\")\n" +
+               "- sourceWord: \"publication\" (synonym - should be \"book\")\n" +
+               "- sourceSentence: \"The libro is on the table\" (mixing languages)\n" +
+               "- targetSentence: \"El book está en la mesa\" (mixing languages)\n\n";
     }
 }
