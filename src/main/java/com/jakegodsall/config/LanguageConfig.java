@@ -7,7 +7,9 @@ import com.jakegodsall.models.Language;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -73,5 +75,14 @@ public class LanguageConfig {
             languageNames.put(entry.getKey(), entry.getValue().getName());
         }
         return languageNames;
+    }
+
+    /**
+     * Retrieves a list of all supported language codes.
+     *
+     * @return a list of all supported language codes
+     */
+    public static List<String> getSupportedLanguageCodes() {
+        return new ArrayList<>(languageMap.keySet());
     }
 }
