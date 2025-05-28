@@ -1,7 +1,7 @@
 package com.jakegodsall.services.json;
 
-import com.jakegodsall.models.enums.FlashcardType;
 import com.jakegodsall.models.flashcards.Flashcard;
+import com.jakegodsall.models.flashcards.components.FlashcardComponent;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,25 +20,24 @@ public interface JsonParseService {
     List<String> parseModels(String json) throws IOException;
 
     /**
-     * Parses the API response body to create a flashcard based on the specified {@link FlashcardType}.
+     * Parses the API response body to create a flashcard based on the specified components.
      *
      * <p>This method processes the JSON response and extracts relevant fields to construct
-     * either an instance of a subclass of {@link Flashcard},
-     * depending on the given {@code FlashcardType}. It ensures that the required fields are present
+     * a flashcard based on the provided components. It ensures that the required fields are present
      * in the response and encapsulates them into the appropriate flashcard object.</p>
      *
      * @param responseBody the raw JSON response from the API.
-     * @param flashcardType the type of flashcard to create, defined by the {@link FlashcardType} enum.
+     * @param components the list of components that define the structure of the flashcard.
      * @return a parsed {@link Flashcard} object.
      */
-    Flashcard parseFlashcard(String responseBody, FlashcardType flashcardType);
+    Flashcard parseFlashcard(String responseBody, List<FlashcardComponent> components);
 
     /**
      * Parses multiple flashcards from a single API response.
      *
      * @param responseBody the raw JSON response from the API containing multiple flashcards.
-     * @param flashcardType the type of flashcards to create, defined by the {@link FlashcardType} enum.
+     * @param components the list of components that define the structure of each flashcard.
      * @return a list of parsed {@link Flashcard} objects.
      */
-    List<Flashcard> parseMultipleFlashcards(String responseBody, FlashcardType flashcardType);
+    List<Flashcard> parseMultipleFlashcards(String responseBody, List<FlashcardComponent> components);
 }

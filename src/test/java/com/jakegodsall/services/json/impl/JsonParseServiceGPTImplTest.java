@@ -2,12 +2,15 @@ package com.jakegodsall.services.json.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jakegodsall.models.enums.FlashcardType;
+import com.jakegodsall.models.flashcards.components.SourceLanguageWord;
+import com.jakegodsall.models.flashcards.components.TargetLanguageSentence;
+import com.jakegodsall.models.flashcards.components.TargetLanguageWord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.NoSuchElementException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -35,7 +38,7 @@ class JsonParseServiceGPTImplTest {
         JsonNode rootNode = new ObjectMapper().readTree(responseBody);
         when(objectMapper.readTree(anyString())).thenReturn(rootNode);
         NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> {
-            jsonParseService.parseFlashcard(responseBody, FlashcardType.WORD);
+            jsonParseService.parseFlashcard(responseBody, List.of(new SourceLanguageWord(), new TargetLanguageWord(), new TargetLanguageSentence()));
         });
         assertEquals("Missing 'sourceWord' field in the JSON response", exception.getMessage());
     }
@@ -46,7 +49,7 @@ class JsonParseServiceGPTImplTest {
         JsonNode rootNode = new ObjectMapper().readTree(responseBody);
         when(objectMapper.readTree(anyString())).thenReturn(rootNode);
         NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> {
-            jsonParseService.parseFlashcard(responseBody, FlashcardType.WORD);
+            jsonParseService.parseFlashcard(responseBody, List.of(new SourceLanguageWord(), new TargetLanguageWord(), new TargetLanguageSentence()));
         });
         assertEquals("Missing 'choices' field in the JSON response", exception.getMessage());
     }
@@ -56,7 +59,7 @@ class JsonParseServiceGPTImplTest {
         String responseBody = "{ \"choices\": [] }";  // Simulates missing 'content' field
         when(objectMapper.readTree(anyString())).thenThrow(new NoSuchElementException("Missing 'content' field in the JSON response"));
         NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> {
-            jsonParseService.parseFlashcard(responseBody, FlashcardType.WORD);
+            jsonParseService.parseFlashcard(responseBody, List.of(new SourceLanguageWord(), new TargetLanguageWord(), new TargetLanguageSentence()));
         });
         assertEquals("Missing 'content' field in the JSON response", exception.getMessage());
     }

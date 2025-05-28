@@ -4,10 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.jakegodsall.models.enums.FlashcardType;
 import com.jakegodsall.models.flashcards.Flashcard;
-import com.jakegodsall.models.flashcards.SentenceFlashcard;
-import com.jakegodsall.models.flashcards.WordFlashcard;
+import com.jakegodsall.models.flashcards.components.FlashcardComponent;
 import lombok.RequiredArgsConstructor;
 import com.jakegodsall.services.json.JsonParseService;
 
@@ -46,19 +44,11 @@ public class JsonParseServiceGPTImpl implements JsonParseService {
     }
 
     @Override
-    public Flashcard parseFlashcard(String responseBody, FlashcardType flashcardType) {
+    public Flashcard parseFlashcard(String responseBody, List<FlashcardComponent> components) {
         try {
             String content = parseContentFromResponse(responseBody);
-
-            // Parse the JSON into a JsonNode tree
             JsonNode rootNode = objectMapper.readTree(content);
-
-            // Delegate to specific parsing logic based on FlashcardType
-            return switch (flashcardType) {
-                case WORD -> parseWordFlashcardFromJson(rootNode);
-                case SENTENCE -> parseSentenceFlashcardFromJson(rootNode);
-                default -> throw new IllegalArgumentException("Unsupported FlashcardType: " + flashcardType);
-            };
+            return parseFlashcardFromJson(rootNode, components);
         } catch (JsonProcessingException ex) {
             System.err.println(ex.getMessage());
             return null;
@@ -66,7 +56,7 @@ public class JsonParseServiceGPTImpl implements JsonParseService {
     }
 
     @Override
-    public List<Flashcard> parseMultipleFlashcards(String responseBody, FlashcardType flashcardType) {
+    public List<Flashcard> parseMultipleFlashcards(String responseBody, List<FlashcardComponent> components) {
         try {
             String content = parseContentFromResponse(responseBody);
             JsonNode rootNode = objectMapper.readTree(content);
@@ -78,12 +68,7 @@ public class JsonParseServiceGPTImpl implements JsonParseService {
             }
 
             for (JsonNode flashcardNode : rootNode) {
-                Flashcard flashcard = switch (flashcardType) {
-                    case WORD -> parseWordFlashcardFromJson(flashcardNode);
-                    case SENTENCE -> parseSentenceFlashcardFromJson(flashcardNode);
-                    default -> throw new IllegalArgumentException("Unsupported FlashcardType: " + flashcardType);
-                };
-                flashcards.add(flashcard);
+                flashcards.add(parseFlashcardFromJson(flashcardNode, components));
             }
 
             return flashcards;
@@ -94,31 +79,21 @@ public class JsonParseServiceGPTImpl implements JsonParseService {
     }
 
     /**
-     * Parses a WordFlashcard from the given JsonNode.
+     * Parses a flashcard from the given JsonNode based on the provided components.
      */
-    private WordFlashcard parseWordFlashcardFromJson(JsonNode rootNode) {
-        JsonNode sourceWordNode = getJsonNode(rootNode, "sourceWord");
-        JsonNode targetWordNode = getJsonNode(rootNode, "targetWord");
-        JsonNode targetSentenceNode = getJsonNode(rootNode, "targetSentence");
+    private Flashcard parseFlashcardFromJson(JsonNode rootNode, List<FlashcardComponent> components) {
+        // Create a map of component CSV column names to their values
+        var componentValues = new java.util.HashMap<String, String>();
+        
+        // Extract values for each component
+        for (FlashcardComponent component : components) {
+            String columnName = component.getCsvColumnName();
+            JsonNode node = getJsonNode(rootNode, columnName);
+            componentValues.put(columnName, node.asText());
+        }
 
-        return new WordFlashcard(
-                sourceWordNode.asText(),
-                targetWordNode.asText(),
-                targetSentenceNode.asText()
-        );
-    }
-
-    /**
-     * Parses a SentenceFlashcard from the given JsonNode.
-     */
-    private SentenceFlashcard parseSentenceFlashcardFromJson(JsonNode rootNode) {
-        JsonNode sourceSentenceNode = getJsonNode(rootNode, "sourceSentence");
-        JsonNode targetSentenceNode = getJsonNode(rootNode, "targetSentence");
-
-        return new SentenceFlashcard(
-                sourceSentenceNode.asText(),
-                targetSentenceNode.asText()
-        );
+        // Create a new Flashcard with the extracted values
+        return new Flashcard(componentValues);
     }
 
     /**

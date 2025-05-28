@@ -5,12 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.jakegodsall.models.Language;
-import com.jakegodsall.models.enums.FlashcardType;
-import com.jakegodsall.models.flashcards.SentenceFlashcard;
-import com.jakegodsall.models.flashcards.WordFlashcard;
+import com.jakegodsall.models.flashcards.components.FlashcardComponent;
+import com.jakegodsall.models.flashcards.components.SourceLanguageSentence;
 import com.jakegodsall.services.prompt.PromptService;
 import com.jakegodsall.models.Options;
-
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of PromptService for GPT-specific prompt generation.
@@ -36,20 +36,21 @@ public class PromptServiceGPTImpl implements PromptService {
     }
 
     @Override
-    public String generatePrompt(String targetWord, FlashcardType flashcardType, Language sourceLanguage, Language targetLanguage, Options options) {
+    public String generatePrompt(String targetWord, List<FlashcardComponent> components, Language sourceLanguage, Language targetLanguage, Options options) {
         return generateBasePrompt() + 
-               getDescriptionOfContent(flashcardType) + 
-               getFlashcardStructure(flashcardType) + 
-               "The word in the target language is \"" + targetWord + "\" and the target language is " + targetLanguage.getName() + ".\n" +
+               getComponentsDescription(components) + 
+               getComponentsJsonStructure(components) + 
+               "The word in the target language is \"" + targetWord + "\" (" + targetLanguage.getName() + 
+               ") and needs to be translated to " + sourceLanguage.getName() + ".\n" +
                getFormattingRules();
     }
 
     @Override   
-    public String generatePromptForMultipleFlashcards(String targetWord, FlashcardType flashcardType, Language sourceLanguage, Language targetLanguage, Options options, int count) {
+    public String generatePromptForMultipleFlashcards(String targetWord, List<FlashcardComponent> components, Language sourceLanguage, Language targetLanguage, Options options, int count) {
         StringBuilder prompt = new StringBuilder();
         
         // Initial warning about target word usage
-        if (flashcardType == FlashcardType.SENTENCE) {
+        if (components.stream().anyMatch(c -> c instanceof SourceLanguageSentence)) {
             prompt.append("⚠️ CRITICAL REQUIREMENT: When generating sentences, you must NEVER use the word \"")
                   .append(targetWord)
                   .append("\" in the source language sentences. Instead, use its translation or rephrase the sentence completely.\n\n");
@@ -66,9 +67,9 @@ public class PromptServiceGPTImpl implements PromptService {
               .append(targetWord)
               .append("\" in the target language - do not use synonyms or related words.\n")
               .append(generateBasePrompt())
-              .append(getDescriptionOfContent(flashcardType))
+              .append(getComponentsDescription(components))
               .append("The structure for each flashcard in the array should be:\n")
-              .append(getFlashcardStructure(flashcardType))
+              .append(getComponentsJsonStructure(components))
               .append(giveExampleSentence())
               .append("The word in the target language is \"")
               .append(targetWord)
@@ -95,20 +96,18 @@ public class PromptServiceGPTImpl implements PromptService {
         return "Given a word in a target language generate the following JSON.\n\"The JSON should include:\n";
     }
 
-    private String getDescriptionOfContent(FlashcardType flashcardType) {
-        return switch (flashcardType) {
-            case WORD -> WordFlashcard.DESCRIPTION_OF_CONTENT;
-            case SENTENCE -> SentenceFlashcard.DESCRIPTION_OF_CONTENT;
-            default -> throw new IllegalArgumentException("Unsupported FlashcardType: " + flashcardType);
-        };
+    private String getComponentsDescription(List<FlashcardComponent> components) {
+        return components.stream()
+                .map(FlashcardComponent::getDescription)
+                .collect(Collectors.joining(", ")) + "\n";
     }
 
-    private String getFlashcardStructure(FlashcardType flashcardType) {
-        return switch (flashcardType) {
-            case WORD -> WordFlashcard.JSON_STRUCTURE_FOR_PROMPT;
-            case SENTENCE -> SentenceFlashcard.JSON_STRUCTURE_FOR_PROMPT;
-            default -> throw new IllegalArgumentException("Unsupported FlashcardType: " + flashcardType);
-        };
+    private String getComponentsJsonStructure(List<FlashcardComponent> components) {
+        return "{\n" +
+               components.stream()
+                       .map(FlashcardComponent::getJsonStructure)
+                       .collect(Collectors.joining(",\n")) +
+               "\n}\n";
     }
 
     private String getFormattingRules() {
