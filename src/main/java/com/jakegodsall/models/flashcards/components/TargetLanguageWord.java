@@ -6,8 +6,8 @@ import com.jakegodsall.utils.StringUtils;
  * Component representing a word in the target language.
  */
 public class TargetLanguageWord implements FlashcardComponent {
-    private static final String DESCRIPTION = "The word in the target language";
-    private static final String JSON_STRUCTURE = StringUtils.createJsonComponent("targetWord", "<word in target language>");
+    private static final String DESCRIPTION = "The exact TARGET LANGUAGE word as provided (the original word given, not translated)";
+    private static final String JSON_STRUCTURE = StringUtils.createJsonComponent("targetWord", "<exact target word provided, unchanged>");
     private static final String CSV_COLUMN = "targetWord";
 
     @Override
