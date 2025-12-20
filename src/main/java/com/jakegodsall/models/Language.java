@@ -25,12 +25,4 @@ public class Language {
     public String toString() {
         return this.name;
     }
-
-    public String toStringVerbose() {
-        return "(name=" + this.name
-                + ", supportsStress=" + this.isSupportsStress()
-                + ", tenses=" + this.getTenses()
-                + ", genders=" + this.getGenders()
-                + ")";
-    }
 }
